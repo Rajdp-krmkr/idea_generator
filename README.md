@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Idea Generator
 
-## Getting Started
+Sector-based innovation idea web app built with Next.js App Router.
 
-First, run the development server:
+## What it does
+
+- Lets you pick a sector, region focus, and timeframe.
+- Fetches recent sector signals from Google News RSS.
+- Uses Gemini (when key is provided) to generate structured startup ideas.
+- Falls back to heuristic ideas when Gemini key is missing or rate-limited.
+
+## Quick start
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+1. Create local environment file:
+
+```bash
+copy .env.example .env.local
+```
+
+1. Add your keys in `.env.local` (Gemini optional, Firebase required for login):
+
+```env
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-2.0-flash
+
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
+```
+
+1. In Firebase Console, enable authentication providers:
+  - Email/Password
+  - Google
+
+1. Create Firestore database and keep a `users` collection available for user profile docs.
+
+1. Run app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Open <http://localhost:3000>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `POST /api/generate-ideas`
 
-## Learn More
+Request body:
 
-To learn more about Next.js, take a look at the following resources:
+```json
+{
+  "sector": "Healthcare",
+  "region": "Global",
+  "timeframeDays": 30
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Response includes `ideas`, `signalsCount`, and metadata.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- This MVP intentionally uses lightweight source ingestion (RSS) and single-route orchestration.
+- For production, add stronger source diversity, caching, retry controls, and abuse throttling.
